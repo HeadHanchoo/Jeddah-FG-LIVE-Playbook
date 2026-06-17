@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jeddah Flag Football</title>
+    <meta
+      name="description"
+      content="Team hub, roster, playbook, and play designer for Jeddah Flag Football."
+    />
+    <link rel="icon" href="assets/jeddah_flag_football_logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="energy-cursor" aria-hidden="true"></div>
+    <div class="route-bg" aria-hidden="true">
+      <svg viewBox="0 0 1440 1200" preserveAspectRatio="none" focusable="false">
+        <defs>
+          <marker id="routeArrow" markerWidth="18" markerHeight="18" refX="15" refY="9" orient="auto" markerUnits="strokeWidth">
+            <path d="M2 2 L16 9 L2 16 Z" />
+          </marker>
+        </defs>
+        <path class="route-fly" marker-end="url(#routeArrow)" d="M150 1040 L150 210" />
+        <path class="route-hitch" marker-end="url(#routeArrow)" d="M310 1040 L310 620 L250 690" />
+        <path class="route-slant" marker-end="url(#routeArrow)" d="M470 1040 L470 860 L650 650" />
+        <path class="route-out" marker-end="url(#routeArrow)" d="M660 1040 L660 725 L850 725" />
+        <path class="route-post" marker-end="url(#routeArrow)" d="M840 1040 L840 740 L1080 430" />
+        <path class="route-corner" marker-end="url(#routeArrow)" d="M1015 1040 L1015 760 L1245 530" />
+        <path class="route-drag" marker-end="url(#routeArrow)" d="M1250 1040 L1250 900 L500 900" />
+        <path class="route-comeback" marker-end="url(#routeArrow)" d="M1320 1040 L1320 470 L1225 560" />
+      </svg>
+    </div>
+    <header class="site-header">
+      <div class="masthead">
+        <p class="eyebrow">5v5 flag football in Jeddah</p>
+        <a class="brand" href="#top" aria-label="Jeddah Flag Football home">
+          <img src="assets/jeddah_flag_football_logo.png" alt="Jeddah Flag Football logo" />
+        </a>
+        <h1>Jeddah Flag Football</h1>
+      </div>
+      <nav aria-label="Main navigation">
+        <a href="#top">Home</a>
+        <a href="#roster">Roster</a>
+        <a href="#playbook">Playbook</a>
+        <a href="#designer">Designer</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode">
+          <span class="theme-toggle-icon" aria-hidden="true"></span>
+          <span id="themeToggleText">Dark</span>
+        </button>
+      </nav>
+    </header>
+
+    <aside class="section-rail" aria-label="Section navigation">
+      <a class="rail-link active" href="#top" data-spy-link="top">Home</a>
+      <a class="rail-link" href="#roster" data-spy-link="roster">Roster</a>
+      <a class="rail-link" href="#designer" data-spy-link="designer">Designer</a>
+      <a class="rail-link" href="#playbook" data-spy-link="playbook">Playbook</a>
+      <a class="rail-link rail-sub" href="#playbook-route-tree" data-spy-link="playbook-route-tree">Route Tree</a>
+      <a class="rail-link rail-sub" href="#playbook-single-back" data-spy-link="playbook-single-back">Single Back</a>
+      <a class="rail-link rail-sub" href="#playbook-spread" data-spy-link="playbook-spread">Spread</a>
+      <a class="rail-link rail-sub" href="#playbook-bunch" data-spy-link="playbook-bunch">Bunch</a>
+      <a class="rail-link rail-sub" href="#playbook-trips" data-spy-link="playbook-trips">Trips</a>
+      <a class="rail-link rail-sub" href="#playbook-trips-stack" data-spy-link="playbook-trips-stack">Trips Stack</a>
+      <a class="rail-link rail-sub" href="#playbook-twins" data-spy-link="playbook-twins">Twins</a>
+      <a class="rail-link rail-sub" href="#playbook-twins-stack" data-spy-link="playbook-twins-stack">Twins Stack</a>
+      <a class="rail-link rail-sub" href="#playbook-i-formation" data-spy-link="playbook-i-formation">I Formation</a>
+      <a class="rail-link rail-sub" href="#playbook-double-back" data-spy-link="playbook-double-back">Double Back</a>
+      <a class="rail-link rail-sub" href="#playbook-single-set" data-spy-link="playbook-single-set">Single Set</a>
+      <a class="rail-link rail-sub" href="#playbook-run-plays" data-spy-link="playbook-run-plays">Run Plays</a>
+      <a class="rail-link rail-sub" href="#playbook-defensive-coverages" data-spy-link="playbook-defensive-coverages">Defense</a>
+      <button class="rail-theme-toggle" id="railThemeToggle" type="button" aria-label="Switch theme from section rail">
+        <span class="theme-toggle-icon" aria-hidden="true"></span>
+        <span id="railThemeToggleText">Dark</span>
+      </button>
+    </aside>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="feature-label">Jeddah System // 5v5 Team Hub</p>
+          <h2>Everything the squad needs before the next snap.</h2>
+          <p>
+            The #1 team in Jeddah, powered by a live team website with every play call,
+            the full squad roster, and a custom playmaker built for game day.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#designer">Design a play</a>
+            <a class="button ghost" href="#playbook">Team playbook</a>
+          </div>
+        </div>
+        <div class="hero-logo" aria-hidden="true">
+          <img src="assets/jeddah_flag_football_logo.png" alt="" />
+        </div>
+      </section>
+
+      <section class="quick-stats" aria-label="Team summary">
+        <div>
+          <strong>8</strong>
+          <span>Players</span>
+        </div>
+        <div>
+          <strong>Custom</strong>
+          <span>Play designer</span>
+        </div>
+        <div>
+          <strong>56</strong>
+          <span>Team plays</span>
+        </div>
+      </section>
+
+      <section id="roster" class="section roster-section">
+        <div class="section-heading">
+          <p class="eyebrow">Squad</p>
+          <h2>Team Roster</h2>
+        </div>
+        <div class="roster-grid" id="rosterGrid"></div>
+      </section>
+
+      <section id="designer" class="section designer-section">
+        <div class="section-heading">
+          <p class="eyebrow">Custom calls</p>
+          <h2>Play Designer</h2>
+          <p>
+            Quick manual: drag players into position, select a player from the list, then choose
+            <strong>Draw</strong> to click route points on the field or <strong>Basic routes</strong>
+            to apply a preset route from the route board. Switch the field between Normal, 1-point,
+            and 2-point conversion looks. Use Undo point to remove the last bend, Clear routes to
+            reset the play, and Save/Load to keep one custom play in this browser.
+          </p>
+        </div>
+
+        <div class="designer-layout">
+          <aside class="designer-panel" aria-label="Play designer controls">
+            <label>
+              <span>Play name</span>
+              <input id="playName" type="text" value="Jeddah Custom 1" />
+            </label>
+
+            <div class="control-row">
+              <button id="savePlay" class="button primary" type="button">Save</button>
+              <button id="loadPlay" class="button ghost" type="button">Load</button>
+            </div>
+
+            <div class="control-row">
+              <button id="undoPoint" class="button ghost" type="button">Undo point</button>
+              <button id="clearRoutes" class="button ghost" type="button">Clear routes</button>
+            </div>
+
+            <div class="field-mode-tools" aria-label="Field mode">
+              <span>Field mode</span>
+              <div class="field-mode-toggle">
+                <button class="field-mode-button active" type="button" data-field-mode="normal">Normal</button>
+                <button class="field-mode-button" type="button" data-field-mode="one">1 point</button>
+                <button class="field-mode-button" type="button" data-field-mode="two">2 point</button>
+              </div>
+            </div>
+
+            <label>
+              <span>Formation</span>
+              <select id="formationSelect">
+                <option value="spread">Spread</option>
+                <option value="bunch">Bunch</option>
+                <option value="trips">Trips</option>
+                <option value="twins">Twins</option>
+              </select>
+            </label>
+
+            <div class="route-tools" aria-label="Route tools">
+              <div class="mode-toggle" role="group" aria-label="Route mode">
+                <button class="mode-button active" id="drawMode" type="button">Draw</button>
+                <button class="mode-button" id="basicMode" type="button">Basic routes</button>
+              </div>
+              <div class="route-tray">
+                <div class="route-slider" id="routeSlider" aria-label="Basic route menu"></div>
+              </div>
+            </div>
+
+            <div class="player-list" id="playerList"></div>
+            <p class="field-note">
+              Vertical field: 70 yards long, 30 yards wide. End zones are 10 yards each.
+            </p>
+          </aside>
+
+          <div class="field-shell">
+            <svg
+              id="fieldSvg"
+              viewBox="0 0 300 700"
+              role="img"
+              aria-label="Interactive 70 by 30 yard flag football field"
+            ></svg>
+          </div>
+        </div>
+      </section>
+
+      <section id="playbook" class="section playbook-section">
+        <div class="section-heading">
+          <p class="eyebrow">Jeddah playbook</p>
+          <h2>Team Playbook</h2>
+          <p>
+            Custom team play calls for Jeddah Flag Football, organized by formation so the squad
+            can study fast, review assignments, and lock in the next call before kickoff. Open any
+            play to see the diagram bigger.
+          </p>
+        </div>
+        <div class="playbook-tools">
+          <label class="search-box">
+            <span>Search plays</span>
+            <input id="playSearch" type="search" placeholder="Try single back, trips, reverse..." />
+          </label>
+          <div class="tabs" id="playFilters" aria-label="Playbook filters"></div>
+        </div>
+        <div class="play-grid" id="playGrid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Jeddah Flag Football</span>
+      <span>Team playbook and custom designer</span>
+    </footer>
+
+    <div class="play-modal" id="playModal" hidden>
+      <button class="modal-backdrop" id="modalBackdrop" type="button" aria-label="Close play preview"></button>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <div>
+            <span class="pill" id="modalGroup">Play</span>
+            <h2 id="modalTitle">Play title</h2>
+            <p id="modalNote">Play note</p>
+          </div>
+          <button class="modal-close" id="modalClose" type="button" aria-label="Close play preview">x</button>
+        </div>
+        <div class="modal-diagram" id="modalDiagram"></div>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
