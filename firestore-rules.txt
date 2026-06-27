@@ -16,6 +16,7 @@ service cloud.firestore {
           'players',
           'likes',
           'likeCount',
+          'archived',
           'createdAt'
         ])
         && request.resource.data.name is string
@@ -26,11 +27,28 @@ service cloud.firestore {
         && request.resource.data.creatorName is string
         && request.resource.data.creatorNumber is string
         && request.resource.data.players is list
-        && request.resource.data.likeCount == 0;
+        && request.resource.data.likeCount == 0
+        && request.resource.data.archived == false;
 
       allow update: if
-        request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'likeCount'])
-        && request.resource.data.likeCount == resource.data.likeCount + 1;
+        (
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['likes', 'likeCount'])
+          && resource.data.archived == false
+          && request.resource.data.likeCount == resource.data.likeCount + 1
+        )
+        ||
+        (
+          request.resource.data.diff(resource.data).changedKeys().hasOnly([
+            'archived',
+            'archivedBy',
+            'archivedByNumber',
+            'archivedAt'
+          ])
+          && resource.data.archived == false
+          && request.resource.data.archived == true
+          && request.resource.data.archivedBy is string
+          && request.resource.data.archivedByNumber is string
+        );
     }
   }
 }

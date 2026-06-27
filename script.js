@@ -812,6 +812,7 @@ const formationSelect = document.querySelector("#formationSelect");
 const playName = document.querySelector("#playName");
 const playDescription = document.querySelector("#playDescription");
 const playCreator = document.querySelector("#playCreator");
+const playViewFilter = document.querySelector("#playViewFilter");
 const creatorFilter = document.querySelector("#creatorFilter");
 const likePlayer = document.querySelector("#likePlayer");
 const savedPlaysList = document.querySelector("#savedPlaysList");
@@ -956,6 +957,13 @@ function loadDesignerPlay(play) {
   renderField();
 }
 
+function getArchivedTime(play) {
+  if (!play?.archivedAt) return 0;
+  if (typeof play.archivedAt.toMillis === "function") return play.archivedAt.toMillis();
+  if (typeof play.archivedAt.seconds === "number") return play.archivedAt.seconds * 1000;
+  return 0;
+}
+
 function renderSavedTeamPlays() {
   if (!savedPlaysList) return;
   if (!firestoreApi) {
@@ -968,13 +976,22 @@ function renderSavedTeamPlays() {
   }
 
   const selectedCreator = creatorFilter?.value || "all";
+  const selectedView = playViewFilter?.value || "active";
+  const viewFilteredPlays =
+    selectedView === "archived"
+      ? savedTeamPlays
+          .filter((play) => play.archived)
+          .sort((a, b) => getArchivedTime(b) - getArchivedTime(a))
+      : savedTeamPlays.filter((play) => !play.archived);
   const visiblePlays =
     selectedCreator === "all"
-      ? savedTeamPlays
-      : savedTeamPlays.filter((play) => play.creatorName === selectedCreator);
+      ? viewFilteredPlays
+      : viewFilteredPlays.filter((play) => play.creatorName === selectedCreator);
 
   if (!visiblePlays.length) {
-    savedPlaysList.innerHTML = `<p class="empty-state">No saved plays by ${escapeHtml(selectedCreator)} yet.</p>`;
+    const creatorText = selectedCreator === "all" ? "the team" : selectedCreator;
+    const viewText = selectedView === "archived" ? "archived" : "active";
+    savedPlaysList.innerHTML = `<p class="empty-state">No ${viewText} plays by ${escapeHtml(creatorText)} yet.</p>`;
     return;
   }
 
@@ -982,6 +999,16 @@ function renderSavedTeamPlays() {
     .map((play, index) => {
       const likes = play.likeCount || Object.keys(play.likes || {}).length || 0;
       const likedNames = Object.keys(play.likes || {});
+      const archivedMeta = play.archived
+        ? `<span>Archived by ${escapeHtml(play.archivedBy || "Jeddah player")}${play.archivedByNumber ? ` #${escapeHtml(play.archivedByNumber)}` : ""}</span>`
+        : "";
+      const actionButtons = play.archived
+        ? `<button class="button ghost" type="button" data-load-team-play="${escapeHtml(play.id)}">Load play</button>`
+        : `
+              <button class="button ghost" type="button" data-load-team-play="${escapeHtml(play.id)}">Load play</button>
+              <button class="button primary" type="button" data-like-team-play="${escapeHtml(play.id)}">Like as selected player</button>
+              <button class="button ghost danger" type="button" data-archive-team-play="${escapeHtml(play.id)}">Archive play</button>
+            `;
       return `
         <article class="saved-play-card">
           <div class="saved-play-rank">#${index + 1}</div>
@@ -994,10 +1021,10 @@ function renderSavedTeamPlays() {
             <div class="saved-play-meta">
               <span>By ${escapeHtml(play.creatorName || "Jeddah player")} #${escapeHtml(play.creatorNumber || "")}</span>
               <span>${escapeHtml(play.formation || "custom")} / ${escapeHtml(play.designerMode || "normal")}</span>
+              ${archivedMeta}
             </div>
             <div class="saved-play-actions">
-              <button class="button ghost" type="button" data-load-team-play="${escapeHtml(play.id)}">Load play</button>
-              <button class="button primary" type="button" data-like-team-play="${escapeHtml(play.id)}">Like as selected player</button>
+              ${actionButtons}
             </div>
             <small>${likedNames.length ? `Liked by ${escapeHtml(likedNames.join(", "))}` : "No likes yet."}</small>
           </div>
@@ -1055,6 +1082,7 @@ async function saveOnlinePlay() {
       ...payload,
       likes: {},
       likeCount: 0,
+      archived: false,
       createdAt: firestoreApi.serverTimestamp(),
     });
     setSaveStatus("Saved online for the team.", "success");
@@ -1090,6 +1118,31 @@ async function likeOnlinePlay(playId) {
   } catch (error) {
     console.error(error);
     setSaveStatus("Could not add like. Check Firebase rules.", "error");
+  }
+}
+
+async function archiveOnlinePlay(playId) {
+  const actor = getSelectedRosterPlayer(likePlayer);
+  if (!firestoreApi || !playId || !actor) return;
+
+  const play = savedTeamPlays.find((item) => item.id === playId);
+  if (play?.archived) {
+    setSaveStatus("This play is already archived.", "warning");
+    return;
+  }
+
+  try {
+    const playRef = firestoreApi.doc(firestoreApi.db, customPlaysCollection, playId);
+    await firestoreApi.updateDoc(playRef, {
+      archived: true,
+      archivedBy: actor.name,
+      archivedByNumber: actor.number,
+      archivedAt: firestoreApi.serverTimestamp(),
+    });
+    setSaveStatus(`${actor.name} archived the play.`, "success");
+  } catch (error) {
+    console.error(error);
+    setSaveStatus("Could not archive play. Check Firebase rules.", "error");
   }
 }
 
@@ -1413,9 +1466,16 @@ savedPlaysList?.addEventListener("click", (event) => {
   const likeButton = event.target.closest("[data-like-team-play]");
   if (likeButton) {
     likeOnlinePlay(likeButton.dataset.likeTeamPlay);
+    return;
+  }
+
+  const archiveButton = event.target.closest("[data-archive-team-play]");
+  if (archiveButton) {
+    archiveOnlinePlay(archiveButton.dataset.archiveTeamPlay);
   }
 });
 
+playViewFilter?.addEventListener("change", renderSavedTeamPlays);
 creatorFilter?.addEventListener("change", renderSavedTeamPlays);
 
 renderRosterSelects();

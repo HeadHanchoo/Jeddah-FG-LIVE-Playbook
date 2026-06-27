@@ -3470,6 +3470,22 @@ textarea:focus {
   min-height: 42px;
 }
 
+.button.danger,
+.saved-play-actions .button.danger {
+  color: var(--danger);
+  border-color: rgba(217, 77, 55, 0.55);
+  background: rgba(217, 77, 55, 0.06);
+}
+
+.button.danger:hover,
+.button.danger:focus-visible,
+.saved-play-actions .button.danger:hover,
+.saved-play-actions .button.danger:focus-visible {
+  color: #ffffff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
 html[data-theme="dark"] textarea {
   color: #eefbf1;
   background: #07170d;
