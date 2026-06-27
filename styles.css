@@ -43,6 +43,7 @@ a {
 
 button,
 input,
+textarea,
 select {
   font: inherit;
 }
@@ -3286,5 +3287,236 @@ html[data-theme="dark"] .route-bg marker path {
   .route-bg::before,
   .route-bg::after {
     animation: none;
+  }
+}
+
+/* Firebase saved custom plays. */
+textarea {
+  width: 100%;
+  resize: vertical;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(23, 169, 54, 0.14);
+  outline: none;
+}
+
+.save-status {
+  min-height: 22px;
+  margin: -2px 0 4px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.save-status[data-tone="success"] {
+  color: var(--green-dark);
+}
+
+.save-status[data-tone="warning"] {
+  color: #9c6a00;
+}
+
+.save-status[data-tone="error"] {
+  color: var(--danger);
+}
+
+.saved-plays-panel {
+  margin-top: clamp(28px, 5vw, 56px);
+  border: 1px solid var(--ink);
+  background:
+    linear-gradient(90deg, rgba(23, 169, 54, 0.06), transparent 38%),
+    var(--white);
+}
+
+.saved-plays-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(18px, 3vw, 28px);
+  border-bottom: 1px solid var(--line);
+}
+
+.saved-plays-heading h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 0.95;
+}
+
+.saved-plays-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 12px;
+  min-width: min(520px, 100%);
+}
+
+.saved-plays-heading label,
+.saved-plays-controls label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.saved-plays-list {
+  display: grid;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 28px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.saved-play-card {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+
+.saved-play-card:last-child {
+  border-bottom: 0;
+}
+
+.saved-play-rank {
+  display: grid;
+  place-items: center;
+  color: var(--green-dark);
+  border-right: 1px solid var(--line);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.saved-play-content {
+  display: grid;
+  gap: 12px;
+  padding: clamp(18px, 3vw, 26px);
+}
+
+.saved-play-topline {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.saved-play-topline h4 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.35rem, 2.5vw, 2.35rem);
+  line-height: 1;
+}
+
+.saved-play-topline strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 86px;
+  padding: 8px 10px;
+  color: #ffffff;
+  background: var(--green-dark);
+  font-size: 0.84rem;
+  text-transform: uppercase;
+}
+
+.saved-play-content p {
+  max-width: 72ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.saved-play-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.saved-play-meta span,
+.saved-play-content small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.saved-play-meta span {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  background: rgba(23, 169, 54, 0.06);
+}
+
+.saved-play-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.saved-play-actions .button {
+  min-height: 42px;
+}
+
+html[data-theme="dark"] textarea {
+  color: #eefbf1;
+  background: #07170d;
+  border-color: rgba(23, 169, 54, 0.58);
+}
+
+html[data-theme="dark"] .saved-plays-panel {
+  background:
+    linear-gradient(90deg, rgba(23, 169, 54, 0.12), transparent 38%),
+    #07110a;
+  border-color: rgba(23, 169, 54, 0.55);
+}
+
+html[data-theme="dark"] .saved-play-topline strong {
+  background: var(--green-dark);
+  box-shadow: 0 0 18px rgba(23, 169, 54, 0.2);
+}
+
+html[data-theme="dark"] .save-status[data-tone="success"] {
+  color: #7cff93;
+}
+
+html[data-theme="dark"] .save-status[data-tone="warning"] {
+  color: #ffd36b;
+}
+
+@media (max-width: 700px) {
+  .saved-plays-heading,
+  .saved-play-topline {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .saved-plays-controls {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .saved-play-card {
+    grid-template-columns: 1fr;
+  }
+
+  .saved-play-rank {
+    justify-content: start;
+    min-height: 54px;
+    padding: 0 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
 }

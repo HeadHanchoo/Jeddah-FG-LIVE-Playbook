@@ -136,10 +136,25 @@
               <input id="playName" type="text" value="Jeddah Custom 1" />
             </label>
 
+            <label>
+              <span>Play description</span>
+              <textarea
+                id="playDescription"
+                rows="4"
+                placeholder="Example: Trips right, X clears, Y sits, Z attacks the back corner."
+              ></textarea>
+            </label>
+
+            <label>
+              <span>Created by</span>
+              <select id="playCreator"></select>
+            </label>
+
             <div class="control-row">
-              <button id="savePlay" class="button primary" type="button">Save</button>
-              <button id="loadPlay" class="button ghost" type="button">Load</button>
+              <button id="savePlay" class="button primary" type="button">Save online</button>
+              <button id="loadPlay" class="button ghost" type="button">Load local</button>
             </div>
+            <p class="save-status" id="saveStatus" aria-live="polite"></p>
 
             <div class="control-row">
               <button id="undoPoint" class="button ghost" type="button">Undo point</button>
@@ -188,6 +203,28 @@
               role="img"
               aria-label="Interactive 70 by 30 yard flag football field"
             ></svg>
+          </div>
+        </div>
+
+        <div class="saved-plays-panel">
+          <div class="saved-plays-heading">
+            <div>
+              <p class="eyebrow">Team calls</p>
+              <h3>Saved Custom Plays</h3>
+            </div>
+            <div class="saved-plays-controls">
+              <label>
+                <span>Show plays by</span>
+                <select id="creatorFilter"></select>
+              </label>
+              <label>
+                <span>Like as</span>
+                <select id="likePlayer"></select>
+              </label>
+            </div>
+          </div>
+          <div class="saved-plays-list" id="savedPlaysList">
+            <p class="empty-state">Saved team plays will show here after Firebase connects.</p>
           </div>
         </div>
       </section>

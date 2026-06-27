@@ -15,6 +15,26 @@ const roster = [
   { name: "Aser Nour", number: "91", offense: ["Slot receiver", "Center"], defense: ["Coverage"] },
 ];
 
+const firebaseConfig = {
+  apiKey: "AIzaSyA4tqQU6AfYpSYtYVgpOUAmLS0WfeKeRGU",
+  authDomain: "jft-playbook.firebaseapp.com",
+  projectId: "jft-playbook",
+  storageBucket: "jft-playbook.firebasestorage.app",
+  messagingSenderId: "370965370644",
+  appId: "1:370965370644:web:0eee5265ac774800a09401",
+};
+
+const customPlaysCollection = "customPlays";
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 const formationBases = {
   singleBack: [
     ["Q", 128, 110],
@@ -790,6 +810,12 @@ const svg = document.querySelector("#fieldSvg");
 const playerList = document.querySelector("#playerList");
 const formationSelect = document.querySelector("#formationSelect");
 const playName = document.querySelector("#playName");
+const playDescription = document.querySelector("#playDescription");
+const playCreator = document.querySelector("#playCreator");
+const creatorFilter = document.querySelector("#creatorFilter");
+const likePlayer = document.querySelector("#likePlayer");
+const savedPlaysList = document.querySelector("#savedPlaysList");
+const saveStatus = document.querySelector("#saveStatus");
 const savePlay = document.querySelector("#savePlay");
 const loadPlay = document.querySelector("#loadPlay");
 const undoPoint = document.querySelector("#undoPoint");
@@ -868,6 +894,204 @@ let players = cloneFormation("spread");
 let selectedId = "X";
 let draggingId = null;
 let routeMode = "draw";
+let firestoreApi = null;
+let savedTeamPlays = [];
+
+function getRosterOption(player) {
+  return `${player.name} - #${player.number}`;
+}
+
+function renderRosterSelects() {
+  const options = roster
+    .map((player) => `<option value="${escapeHtml(player.name)}">${escapeHtml(getRosterOption(player))}</option>`)
+    .join("");
+  if (playCreator) playCreator.innerHTML = options;
+  if (likePlayer) likePlayer.innerHTML = options;
+  if (creatorFilter) creatorFilter.innerHTML = `<option value="all">All players</option>${options}`;
+}
+
+function setSaveStatus(message, tone = "") {
+  if (!saveStatus) return;
+  saveStatus.textContent = message;
+  saveStatus.dataset.tone = tone;
+}
+
+function getSelectedRosterPlayer(select = playCreator) {
+  return roster.find((player) => player.name === select?.value) || roster[0];
+}
+
+function serializeDesignerPlay() {
+  const creator = getSelectedRosterPlayer(playCreator);
+  return {
+    name: playName.value.trim() || "Jeddah Custom Play",
+    description: playDescription?.value.trim() || "",
+    creatorName: creator.name,
+    creatorNumber: creator.number,
+    formation: formationSelect.value,
+    designerMode,
+    players: players.map((player) => ({
+      id: player.id,
+      label: player.label,
+      x: Math.round(player.x),
+      y: Math.round(player.y),
+      route: player.route.map((point) => ({
+        x: Math.round(point.x),
+        y: Math.round(point.y),
+      })),
+    })),
+  };
+}
+
+function loadDesignerPlay(play) {
+  if (!play) return;
+  playName.value = play.name || "Jeddah Custom Play";
+  if (playDescription) playDescription.value = play.description || "";
+  if (playCreator && play.creatorName) playCreator.value = play.creatorName;
+  if (play.formation && formationSelect.querySelector(`[value="${play.formation}"]`)) {
+    formationSelect.value = play.formation;
+  }
+  setDesignerMode(play.designerMode || "normal", false);
+  players = Array.isArray(play.players) ? play.players : players;
+  selectedId = players[0]?.id || "X";
+  renderField();
+}
+
+function renderSavedTeamPlays() {
+  if (!savedPlaysList) return;
+  if (!firestoreApi) {
+    savedPlaysList.innerHTML = `<p class="empty-state">Connecting to Firebase...</p>`;
+    return;
+  }
+  if (!savedTeamPlays.length) {
+    savedPlaysList.innerHTML = `<p class="empty-state">No saved custom plays yet. Build one, add a description, choose your name, and save it online.</p>`;
+    return;
+  }
+
+  const selectedCreator = creatorFilter?.value || "all";
+  const visiblePlays =
+    selectedCreator === "all"
+      ? savedTeamPlays
+      : savedTeamPlays.filter((play) => play.creatorName === selectedCreator);
+
+  if (!visiblePlays.length) {
+    savedPlaysList.innerHTML = `<p class="empty-state">No saved plays by ${escapeHtml(selectedCreator)} yet.</p>`;
+    return;
+  }
+
+  savedPlaysList.innerHTML = visiblePlays
+    .map((play, index) => {
+      const likes = play.likeCount || Object.keys(play.likes || {}).length || 0;
+      const likedNames = Object.keys(play.likes || {});
+      return `
+        <article class="saved-play-card">
+          <div class="saved-play-rank">#${index + 1}</div>
+          <div class="saved-play-content">
+            <div class="saved-play-topline">
+              <h4>${escapeHtml(play.name)}</h4>
+              <strong>${likes} ${likes === 1 ? "like" : "likes"}</strong>
+            </div>
+            <p>${escapeHtml(play.description || "No description yet.")}</p>
+            <div class="saved-play-meta">
+              <span>By ${escapeHtml(play.creatorName || "Jeddah player")} #${escapeHtml(play.creatorNumber || "")}</span>
+              <span>${escapeHtml(play.formation || "custom")} / ${escapeHtml(play.designerMode || "normal")}</span>
+            </div>
+            <div class="saved-play-actions">
+              <button class="button ghost" type="button" data-load-team-play="${escapeHtml(play.id)}">Load play</button>
+              <button class="button primary" type="button" data-like-team-play="${escapeHtml(play.id)}">Like as selected player</button>
+            </div>
+            <small>${likedNames.length ? `Liked by ${escapeHtml(likedNames.join(", "))}` : "No likes yet."}</small>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+async function initFirebasePlaybook() {
+  if (!savedPlaysList) return;
+  renderSavedTeamPlays();
+
+  try {
+    const appModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+    const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js");
+    const app = appModule.initializeApp(firebaseConfig);
+    const db = firestoreModule.getFirestore(app);
+    firestoreApi = { db, ...firestoreModule };
+
+    const playsRef = firestoreModule.collection(db, customPlaysCollection);
+    const playsQuery = firestoreModule.query(playsRef, firestoreModule.orderBy("likeCount", "desc"));
+    firestoreModule.onSnapshot(
+      playsQuery,
+      (snapshot) => {
+        savedTeamPlays = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        renderSavedTeamPlays();
+        setSaveStatus("Online playbook connected.", "success");
+      },
+      (error) => {
+        console.error(error);
+        setSaveStatus("Firebase connected, but saved plays could not load. Check Firestore rules.", "error");
+      },
+    );
+  } catch (error) {
+    console.error(error);
+    setSaveStatus("Firebase did not connect. The site still works locally.", "error");
+    savedPlaysList.innerHTML = `<p class="empty-state">Firebase did not connect. Check the config and internet connection.</p>`;
+  }
+}
+
+async function saveOnlinePlay() {
+  const payload = serializeDesignerPlay();
+  localStorage.setItem("jff-custom-play", JSON.stringify(payload));
+
+  if (!firestoreApi) {
+    setSaveStatus("Saved locally. Firebase is still connecting.", "warning");
+    return;
+  }
+
+  savePlay.disabled = true;
+  setSaveStatus("Saving online...", "");
+  try {
+    await firestoreApi.addDoc(firestoreApi.collection(firestoreApi.db, customPlaysCollection), {
+      ...payload,
+      likes: {},
+      likeCount: 0,
+      createdAt: firestoreApi.serverTimestamp(),
+    });
+    setSaveStatus("Saved online for the team.", "success");
+    savePlay.textContent = "Saved online";
+    setTimeout(() => {
+      savePlay.textContent = "Save online";
+    }, 1300);
+  } catch (error) {
+    console.error(error);
+    setSaveStatus("Could not save online. Check Firebase test mode/rules.", "error");
+  } finally {
+    savePlay.disabled = false;
+  }
+}
+
+async function likeOnlinePlay(playId) {
+  const voter = getSelectedRosterPlayer(likePlayer);
+  if (!firestoreApi || !playId || !voter) return;
+
+  const play = savedTeamPlays.find((item) => item.id === playId);
+  if (play?.likes?.[voter.name]) {
+    setSaveStatus(`${voter.name} already liked this play.`, "warning");
+    return;
+  }
+
+  try {
+    const playRef = firestoreApi.doc(firestoreApi.db, customPlaysCollection, playId);
+    await firestoreApi.updateDoc(playRef, {
+      [`likes.${voter.name}`]: true,
+      likeCount: firestoreApi.increment(1),
+    });
+    setSaveStatus(`${voter.name} liked the play.`, "success");
+  } catch (error) {
+    console.error(error);
+    setSaveStatus("Could not add like. Check Firebase rules.", "error");
+  }
+}
 
 function cloneFormation(name) {
   const mode = getDesignerMode();
@@ -1167,31 +1391,38 @@ fieldModeButtons.forEach((button) => {
   button.addEventListener("click", () => setDesignerMode(button.dataset.fieldMode));
 });
 
-savePlay.addEventListener("click", () => {
-  localStorage.setItem(
-    "jff-custom-play",
-    JSON.stringify({ name: playName.value.trim() || "Jeddah Custom Play", players, designerMode }),
-  );
-  savePlay.textContent = "Saved";
-  setTimeout(() => {
-    savePlay.textContent = "Save";
-  }, 1300);
-});
+savePlay.addEventListener("click", saveOnlinePlay);
 
 loadPlay.addEventListener("click", () => {
   const saved = localStorage.getItem("jff-custom-play");
   if (!saved) return;
   const data = JSON.parse(saved);
-  playName.value = data.name || "Jeddah Custom Play";
-  setDesignerMode(data.designerMode || "normal", false);
-  players = data.players || players;
-  selectedId = players[0]?.id || "X";
-  renderField();
+  loadDesignerPlay(data);
 });
 
+savedPlaysList?.addEventListener("click", (event) => {
+  const loadButton = event.target.closest("[data-load-team-play]");
+  if (loadButton) {
+    const play = savedTeamPlays.find((item) => item.id === loadButton.dataset.loadTeamPlay);
+    loadDesignerPlay(play);
+    setSaveStatus("Loaded saved team play into the designer.", "success");
+    document.querySelector("#designer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  const likeButton = event.target.closest("[data-like-team-play]");
+  if (likeButton) {
+    likeOnlinePlay(likeButton.dataset.likeTeamPlay);
+  }
+});
+
+creatorFilter?.addEventListener("change", renderSavedTeamPlays);
+
+renderRosterSelects();
 renderRoster();
 renderFilters();
 renderPlaybook();
 setDesignerMode("normal", false);
+initFirebasePlaybook();
 initTheme();
 bindEnergyCursor();
